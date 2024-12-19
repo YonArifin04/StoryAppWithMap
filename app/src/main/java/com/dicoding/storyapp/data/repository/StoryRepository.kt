@@ -8,22 +8,13 @@ import kotlinx.coroutines.flow.map
 
 class StoryRepository(private val apiService: ApiService, private val database: StoryDatabase) {
 
-    fun getStories(): Flow<PagingData<StoryResponseItem>> {
+    fun getStories(): Flow<PagingData<ListStoryItems>> {
         return Pager(
             config = PagingConfig(
                 pageSize = 20,
                 enablePlaceholders = false
             ),
             pagingSourceFactory = { StoryPagingSource(apiService) }
-        ).liveData.asFlow().map { pagingData ->
-            pagingData.map { listStoryItem ->
-                StoryResponseItem(
-                    id = 0, // or any default value
-                    listStory = listOf(listStoryItem),
-                    error = null,
-                    message = null
-                )
-            }
-        }
+        ).flow
     }
 }
