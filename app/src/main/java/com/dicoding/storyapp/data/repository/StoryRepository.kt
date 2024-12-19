@@ -11,8 +11,7 @@ class StoryRepository(private val apiService: ApiService, private val database: 
     fun getStories(): Flow<PagingData<ListStoryItems>> {
         return Pager(
             config = PagingConfig(
-                pageSize = 20,
-                enablePlaceholders = false
+                pageSize = 15
             ),
             pagingSourceFactory = { StoryPagingSource(apiService) }
         ).flow
