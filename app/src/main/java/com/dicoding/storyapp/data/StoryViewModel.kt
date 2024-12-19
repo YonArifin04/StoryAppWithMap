@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.Flow
 
 class StoryViewModel(private val storyRepository: StoryRepository) : ViewModel() {
 
-    val stories: Flow<PagingData<StoryResponseItem>> =
+    val stories: Flow<PagingData<ListStoryItems>> =
         storyRepository.getStories().cachedIn(viewModelScope)
 }
 

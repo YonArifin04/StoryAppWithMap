@@ -5,10 +5,11 @@
     import androidx.recyclerview.widget.RecyclerView
     import com.bumptech.glide.Glide
     import com.dicoding.storyapp.R
+    import com.dicoding.storyapp.data.ListStoryItems
     import com.dicoding.storyapp.data.StoryResponseItem
     import com.dicoding.storyapp.databinding.ItemStoryBinding
 
-    class StoryAdapter : PagingDataAdapter<StoryResponseItem, StoryAdapter.StoryViewHolder>(DIFF_CALLBACK) {
+    class StoryAdapter : PagingDataAdapter<ListStoryItems, StoryAdapter.StoryViewHolder>(DIFF_CALLBACK) {
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): StoryViewHolder {
             val binding = ItemStoryBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -23,11 +24,11 @@
         }
 
         class StoryViewHolder(private val binding: ItemStoryBinding) : RecyclerView.ViewHolder(binding.root) {
-            fun bind(story: StoryResponseItem) {
+            fun bind(story: ListStoryItems) {
                 binding.apply {
-                    yourName.text = story.listStory[0].name
+                    yourName.text = story.name
                     Glide.with(itemView.context)
-                        .load(story.listStory[0].photoUrl)
+                        .load(story.photoUrl)
                         .into(imageLogo)
 
                 }
@@ -35,12 +36,12 @@
         }
 
         companion object {
-            private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<StoryResponseItem>() {
-                override fun areItemsTheSame(oldItem: StoryResponseItem, newItem: StoryResponseItem): Boolean {
+            private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<ListStoryItems>() {
+                override fun areItemsTheSame(oldItem: ListStoryItems, newItem: ListStoryItems): Boolean {
                     return oldItem.id == newItem.id
                 }
 
-                override fun areContentsTheSame(oldItem: StoryResponseItem, newItem: StoryResponseItem): Boolean {
+                override fun areContentsTheSame(oldItem: ListStoryItems, newItem: ListStoryItems): Boolean {
                     return oldItem == newItem
                 }
             }
