@@ -1,0 +1,65 @@
+package com.dicoding.storyapp.view.login
+
+import android.util.Log
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.dicoding.storyapp.data.repository.UserRepository
+import com.dicoding.storyapp.data.pref.UserModel
+import com.dicoding.storyapp.data.pref.UserPreference
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import com.dicoding.storyapp.response.LoginResponse
+import com.dicoding.storyapp.util.SessionManager
+import kotlinx.coroutines.flow.first
+
+private lateinit var userPreference: UserPreference
+
+class LoginViewModel (private val repository: UserRepository) : ViewModel() {
+
+    private lateinit var sessionManager: SessionManager
+
+    fun setSessionManager(sessionManager: SessionManager) {
+        this.sessionManager = sessionManager
+    }
+
+    fun loginUser(
+        email: String,
+        password: String,
+        onResult: (Boolean) -> Unit,
+        dataStore: DataStore<Preferences>
+    ) {
+        userPreference = UserPreference.getInstance(dataStore)
+        val TAG = "loginUser"
+        viewModelScope.launch {
+            try {
+                val response: LoginResponse = repository.login(email, password)
+                Log.d(TAG, "loginUser: ${response.loginResult?.token}")
+                sessionManager.saveToken(response.loginResult?.token ?: "")
+                if (response.error == false) {
+                    CoroutineScope(Dispatchers.IO).launch {
+                        response.loginResult?.userId?.let { response.loginResult.name?.let { it1 ->
+                            response.loginResult.token?.let { it2 ->
+                                UserModel(it,
+                                    it1, it2
+                                )
+                            }
+                        } }
+                            ?.let {
+                                userPreference.saveSession(it)
+                                Log.d("LoginViewModel", "loginUser: ${userPreference.getSession().first().token} , $it")
+                            }
+                    }
+                    onResult(true)
+                } else {
+                    onResult(false)
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "loginUser: ", e)
+                onResult(false)
+            }
+        }
+    }
+}
