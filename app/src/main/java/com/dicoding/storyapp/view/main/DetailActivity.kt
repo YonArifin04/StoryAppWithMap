@@ -10,6 +10,7 @@ import com.dicoding.storyapp.databinding.ActivityDetailBinding
 import com.dicoding.storyapp.response.ListStoryItem
 import java.io.IOException
 import java.util.Locale
+import java.util.TimeZone
 
 class DetailActivity : AppCompatActivity() {
 
@@ -26,7 +27,8 @@ class DetailActivity : AppCompatActivity() {
             Glide.with(this).load(it.photoUrl).into(binding.ivStoryImage)
             binding.tvStoryName.text = it.name
             binding.tvStoryDescription.text = it.description
-            binding.tvStoryCreatedAt.text = it.createdAt
+            binding.tvStoryCreatedAt.text =
+                it.createdAt?.let { it1 -> DateFormatter.formatDate(it1) }
 
             val lat = it.lat
             val lon = it.lon

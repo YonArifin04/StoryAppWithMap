@@ -45,8 +45,9 @@
                         val storyItem = ListStoryItem(
                             photoUrl = story.photoUrl,
                             name = story.name,
+                            createdAt = story.createdAt,
                             description = story.description,
-                            id = story.id
+                            id = story.id,
                         )
                         onItemClickCallback?.onItemClicked(storyItem)
                     }

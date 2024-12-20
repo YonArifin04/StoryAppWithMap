@@ -71,7 +71,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         lifecycleScope.launch {
-            storyModel.stories.collect { pagingData ->
+            storyModel.stories.collectLatest { pagingData ->
                 storyAdapter.submitData(pagingData)
             }
         }
