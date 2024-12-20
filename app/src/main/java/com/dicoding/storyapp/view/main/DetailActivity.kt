@@ -55,4 +55,8 @@ class DetailActivity : AppCompatActivity() {
             "Lokasi tidak ditemukan"
         }
     }
+
+    companion object {
+        const val EXTRA_STORY = "EXTRA_STORY"
+    }
 }
