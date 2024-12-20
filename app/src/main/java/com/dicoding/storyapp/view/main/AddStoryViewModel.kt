@@ -3,9 +3,11 @@ package com.dicoding.storyapp.view.main
 import StoryRepository
 import android.content.ContentValues.TAG
 import android.util.Log
+import androidx.core.view.ContentInfoCompat.Flags
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.dicoding.storyapp.response.AddNewStoryResponse
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -19,25 +21,38 @@ class AddStoryViewModel(private val repository: StoryRepository) : ViewModel() {
     private val _uploadResponse = MutableLiveData<AddNewStoryResponse>()
     val uploadResponse: LiveData<AddNewStoryResponse> = _uploadResponse
 
+    private val _isLoading = MutableLiveData<Boolean>()
+
     fun uploadStory(
-        token: String,
         photo: MultipartBody.Part,
         description: RequestBody,
-        latPart: RequestBody?,
-        lonPart: RequestBody?
+        latPart: Float,
+        lonPart: Float
     ) {
-//        CoroutineScope(Dispatchers.Main).launch {
-//            try {
-//                val response = withContext(Dispatchers.IO) {
-//                    repository.uploadNewStory(token, photo, description, latPart, lonPart)
-//                }
-//                Log.d(TAG, "Response: $response")
-//                _uploadResponse.postValue(response)
-//            } catch (e: HttpException) {
-//                Log.e(TAG, "HTTP error: ${e.message()}")
-//            } catch (e: Exception) {
-//                Log.e(TAG, "Error: ${e.message}")
-//            }
-//        }
+        _isLoading.value = true
+        viewModelScope.launch {
+            try {
+                val response = withContext(Dispatchers.IO) {
+                    repository.uploadNewStory(photo, description, latPart, lonPart)
+                }
+                _uploadResponse.value = response
+            } catch (e: HttpException) {
+                _uploadResponse.value = AddNewStoryResponse(
+                    error = true,
+                    message = "Upload failed: ${e.message()}"
+                )
+            } catch (e: Exception) {
+                _uploadResponse.value = AddNewStoryResponse(
+                    error = true,
+                    message = "Upload failed: ${e.message}"
+                )
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    companion object {
+        private const val TAG = "AddStoryViewModel"
     }
 }

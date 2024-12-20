@@ -110,6 +110,7 @@ class MainActivity : AppCompatActivity() {
         binding.addButton.setOnClickListener {
             val intent = Intent(this, AddStoryActivity::class.java)
             startActivity(intent)
+            finish()
         }
     }
 }

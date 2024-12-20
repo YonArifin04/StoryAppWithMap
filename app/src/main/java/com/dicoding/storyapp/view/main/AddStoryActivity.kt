@@ -39,6 +39,7 @@ import com.dicoding.storyapp.ui.MyButton
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.model.LatLng
+import okhttp3.MediaType.Companion.toMediaType
 import java.io.ByteArrayOutputStream
 
 class AddStoryActivity : AppCompatActivity() {
@@ -48,8 +49,8 @@ class AddStoryActivity : AppCompatActivity() {
     private var token: String? = null
     private lateinit var myButton: MyButton
     private lateinit var fusedLocationClient: FusedLocationProviderClient
-    private var latPart: RequestBody? = null
-    private var lonPart: RequestBody? = null
+    private var latPart: Float? = null
+    private var lonPart: Float? = null
     private val userPreference by lazy { UserPreference.getInstance(dataStore) }
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
@@ -58,10 +59,8 @@ class AddStoryActivity : AppCompatActivity() {
             } else {
                 getMyLastLocation { location ->
                     if (location != null) {
-                        latPart = location.latitude.toString()
-                            .toRequestBody("text/plain".toMediaTypeOrNull())
-                        lonPart = location.longitude.toString()
-                            .toRequestBody("text/plain".toMediaTypeOrNull())
+                        latPart = location.latitude.toFloat()
+                        lonPart = location.longitude.toFloat()
                     } else {
                         Log.d("MainActivity", "Location is null or permission not granted")
                     }
@@ -138,11 +137,9 @@ class AddStoryActivity : AppCompatActivity() {
             uploadButton.setOnClickListener {
                 getMyLastLocation { location ->
                     if (location != null) {
-                        latPart = location.latitude.toString()
-                            .toRequestBody("text/plain".toMediaTypeOrNull())
-                        lonPart = location.longitude.toString()
-                            .toRequestBody("text/plain".toMediaTypeOrNull())
-                        uploadStory(latPart!!, lonPart!!)
+                        val latPart = location.latitude.toFloat()
+                        val lonPart = location.longitude.toFloat()
+                        uploadStory(latPart, lonPart)
                     } else {
                         Log.d("MainActivity", "Location is null or permission not granted")
                     }
@@ -206,7 +203,7 @@ class AddStoryActivity : AppCompatActivity() {
         }
     }
 
-    private fun uploadStory(latPart: RequestBody, lonPart: RequestBody) {
+    private fun uploadStory(latPart: Float, lonPart: Float) {
         val imageUri = mainViewModel.currentImageUri.value
         if (imageUri == null) {
             showToast("No image selected.")
@@ -236,15 +233,15 @@ class AddStoryActivity : AppCompatActivity() {
         val imagePart = MultipartBody.Part.createFormData(
             "photo",
             compressedFile.name,
-            compressedFile.asRequestBody("image/*".toMediaTypeOrNull())
+            compressedFile.asRequestBody("image/jpeg".toMediaTypeOrNull())
         )
 
-        val descriptionPart = description.toRequestBody("text/plain".toMediaTypeOrNull())
+        val requestBody = description.toRequestBody("text/plain".toMediaType())
 
         token?.let {
             Log.d(TAG, "uploadStory: Token: $it")
             Log.d("MainActivity", "Latitude2: $latPart, Longitude: $lonPart")
-            addStoryViewModel.uploadStory(it, imagePart, descriptionPart, latPart, lonPart)
+            addStoryViewModel.uploadStory(imagePart, requestBody, latPart, lonPart)
             Handler(Looper.getMainLooper()).postDelayed({
                 addStoryViewModel.uploadResponse.observe(this) { response ->
                     if (!response.error!!) {
