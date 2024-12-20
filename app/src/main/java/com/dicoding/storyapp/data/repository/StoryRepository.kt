@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.map
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 
-class StoryRepository(private val apiService: ApiService, private val database: StoryDatabase) {
+open class StoryRepository(private val apiService: ApiService, private val database: StoryDatabase) {
 
     fun getStories(): Flow<PagingData<ListStoryItems>> {
         return Pager(

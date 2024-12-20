@@ -56,7 +56,7 @@
         }
 
         companion object {
-            private val DIFF_CALLBACK = object : DiffUtil.ItemCallback<ListStoryItems>() {
+            val DIFF_CALLBACK = object : DiffUtil.ItemCallback<ListStoryItems>() {
                 override fun areItemsTheSame(oldItem: ListStoryItems, newItem: ListStoryItems): Boolean {
                     return oldItem.id == newItem.id
                 }

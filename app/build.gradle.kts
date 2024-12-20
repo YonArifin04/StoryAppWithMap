@@ -51,6 +51,7 @@ dependencies {
     implementation(libs.androidx.room.ktx)
     implementation(libs.androidx.databinding.adapters)
     testImplementation("junit:junit:4.13.2")
+    testImplementation(libs.junit.junit)
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     implementation("androidx.datastore:datastore-preferences:1.0.0")
@@ -87,6 +88,15 @@ dependencies {
     implementation ("androidx.room:room-runtime:2.6.1") // Latest Room version
     annotationProcessor ("androidx.room:room-compiler:2.6.1") // If using Java
     ksp ("androidx.room:room-compiler:2.6.1") // For KSP usage
+
+    androidTestImplementation(libs.androidx.core.testing) //InstantTaskExecutorRule
+    androidTestImplementation(libs.kotlinx.coroutines.test) //TestDispatcher
+
+    testImplementation(libs.androidx.core.testing) // InstantTaskExecutorRule
+    testImplementation(libs.kotlinx.coroutines.test) //TestDispatcher
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.inline)
+    testImplementation("org.mockito:mockito-junit-jupiter:5.4.0")
 
     // KSP (Kotlin Symbol Processing)
     implementation ("com.google.devtools.ksp:symbol-processing-api:1.9.10-1.0.13")
