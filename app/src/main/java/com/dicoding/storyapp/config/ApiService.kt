@@ -46,11 +46,10 @@ interface ApiService {
     @Multipart
     @POST("stories")
     suspend fun uploadNewStory(
-        @Header("Authorization") token: String,
-        @Part photo: MultipartBody.Part,
         @Part("description") description: RequestBody,
-        @Part("lat") lat: RequestBody?,
-        @Part("lon") lon: RequestBody?
+        @Part file: MultipartBody.Part,
+        @Part("lat") lat: Float?,
+        @Part("lon") lon: Float?,
     ): AddNewStoryResponse
 
     @GET("stories")

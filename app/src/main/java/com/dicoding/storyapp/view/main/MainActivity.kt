@@ -4,6 +4,7 @@ import StoryAdapter
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.WindowInsets
 import android.view.WindowManager
 import androidx.activity.viewModels
@@ -18,6 +19,7 @@ import com.dicoding.storyapp.data.pref.UserPreference
 import com.dicoding.storyapp.data.pref.dataStore
 import com.dicoding.storyapp.databinding.ActivityMainBinding
 import com.dicoding.storyapp.factory.ViewModelFactory
+import com.dicoding.storyapp.response.ListStoryItem
 import com.dicoding.storyapp.view.maps.MapsActivity
 import com.dicoding.storyapp.view.welcome.WelcomeActivity
 import kotlinx.coroutines.flow.collectLatest
@@ -40,7 +42,27 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         storyAdapter = StoryAdapter()
+        getData()
+        viewModel.getSession().observe(this) { user ->
+            if (!user.isLogin) {
+                startActivity(Intent(this, WelcomeActivity::class.java))
+                finish()
+            }
+        }
+        storyAdapter.setOnItemClickCallback(object: StoryAdapter.OnItemClickCallback {
+            override fun onItemClicked(detailStory: ListStoryItem?) {
+                val intent = Intent(this@MainActivity, DetailActivity::class.java)
+                intent.putExtra(DetailActivity.EXTRA_STORY, detailStory)
+                startActivity(intent)
+            }
+        })
 
+        setupView()
+        setupAction()
+    }
+
+    private fun getData() {
+        storyAdapter.refresh()
         binding.rvStory.apply {
             layoutManager = LinearLayoutManager(this@MainActivity)
             adapter = storyAdapter.withLoadStateFooter(
@@ -48,20 +70,6 @@ class MainActivity : AppCompatActivity() {
             )
         }
 
-        getData()
-
-        viewModel.getSession().observe(this) { user ->
-            if (!user.isLogin) {
-                startActivity(Intent(this, WelcomeActivity::class.java))
-                finish()
-            }
-        }
-
-        setupView()
-        setupAction()
-    }
-
-    private fun getData() {
         lifecycleScope.launch {
             storyModel.stories.collectLatest { pagingData ->
                 storyAdapter.submitData(pagingData)
@@ -102,6 +110,7 @@ class MainActivity : AppCompatActivity() {
         binding.addButton.setOnClickListener {
             val intent = Intent(this, AddStoryActivity::class.java)
             startActivity(intent)
+            finish()
         }
     }
 }
